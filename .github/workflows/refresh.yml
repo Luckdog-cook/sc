@@ -1,12 +1,14 @@
 name: 刷新订阅并部署
 
 on:
-  # 推代码就跑一次（改 dist/ sub/ 不算，那是本工作流自己提交的，避免套娃）
+  # 推代码就跑一次（订阅文件是本工作流自己提交的，要排除，避免套娃）
   push:
     branches: [main, master]
     paths-ignore:
       - 'dist/**'
-      - 'sub/**'
+      - 'shadowcat.txt'
+      - 'shadowcat.yaml'
+      - 'shadowcat.json'
   schedule:
     # 每 6 小时刷新一次（分钟错开整点，避开 GitHub 排队高峰）
     - cron: '23 */6 * * *'
@@ -39,7 +41,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist sub worker/src/data.js worker/wrangler.toml
+          git add dist shadowcat.txt shadowcat.yaml shadowcat.json \
+              worker/src/data.js worker/wrangler.toml
           if git diff --staged --quiet; then
             echo "订阅内容没有变化，跳过提交"
           else
@@ -63,9 +66,8 @@ jobs:
           REPO: ${{ github.repository }}
           BRANCH: ${{ github.ref_name }}
         run: |
-          SECRET=$(grep -oP '(?<=SUB_SECRET = ")[^"]+' worker/wrangler.toml)
           for f in txt yaml json; do
-            curl -s -X POST "https://purge.jsdelivr.net/gh/$REPO@$BRANCH/sub/$SECRET.$f" \
+            curl -s -X POST "https://purge.jsdelivr.net/gh/$REPO@$BRANCH/shadowcat.$f" \
               -H "User-Agent: shadowcat-sub" -o /dev/null || true
           done
           echo "已请求刷新 CDN 缓存"
@@ -76,22 +78,28 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: |
           SECRET=$(grep -oP '(?<=SUB_SECRET = ")[^"]+' worker/wrangler.toml)
-          BASE="https://cdn.jsdelivr.net/gh/$REPO@$BRANCH/sub/$SECRET"
+          OWNER=$(echo "$REPO" | cut -d/ -f1 | tr '[:upper:]' '[:lower:]')
+          RNAME=$(echo "$REPO" | cut -d/ -f2)
+          JS="https://cdn.jsdelivr.net/gh/$REPO@$BRANCH/shadowcat"
+          IO="https://$OWNER.github.io/$RNAME/shadowcat"
           {
             echo "## ShadowCat 订阅地址"
             echo ""
-            echo "**密钥** \`$SECRET\`"
-            echo ""
-            echo "### GitHub 静态订阅（jsDelivr CDN）"
+            echo "### GitHub Pages（最短）"
             echo ""
             echo "| 类型 | 地址 |"
             echo "|---|---|"
-            echo "| 通用订阅 base64 | \`$BASE.txt\` |"
-            echo "| Clash | \`$BASE.yaml\` |"
-            echo "| sing-box | \`$BASE.json\` |"
+            echo "| 通用订阅 base64 | \`$IO.txt\` |"
+            echo "| Clash | \`$IO.yaml\` |"
+            echo "| sing-box | \`$IO.json\` |"
             echo ""
-            echo "备选：把 \`cdn.jsdelivr.net/gh\` 换成 \`raw.githubusercontent.com\`"
-            echo "（jsDelivr 国内更快，raw 国内访问不稳）。"
+            echo "### jsDelivr CDN（国内更稳）"
+            echo ""
+            echo "| 类型 | 地址 |"
+            echo "|---|---|"
+            echo "| 通用订阅 base64 | \`$JS.txt\` |"
+            echo "| Clash | \`$JS.yaml\` |"
+            echo "| sing-box | \`$JS.json\` |"
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$HAS_CF" = "true" ]; then
@@ -120,7 +128,8 @@ jobs:
           fi
 
           echo "----- 订阅地址 -----"
-          echo "通用订阅: $BASE.txt"
-          echo "Clash   : $BASE.yaml"
-          echo "sing-box: $BASE.json"
+          echo "Pages    通用: $IO.txt"
+          echo "Pages    Clash: $IO.yaml"
+          echo "jsDelivr 通用: $JS.txt"
+          echo "jsDelivr Clash: $JS.yaml"
           echo "--------------------"

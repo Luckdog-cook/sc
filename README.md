@@ -9,17 +9,29 @@ GitHub Actions 每 6 小时自动刷新节点。
 
 ### A. GitHub 静态订阅（推上去就有，不需要 Cloudflare）
 
+订阅文件放在**仓库根目录**，文件名固定 `shadowcat.{txt,yaml,json}`，地址最短最好记：
+
 ```
-https://cdn.jsdelivr.net/gh/<用户名>/shadowcat-sub@main/sub/<密钥>.txt     通用订阅 base64
-https://cdn.jsdelivr.net/gh/<用户名>/shadowcat-sub@main/sub/<密钥>.yaml    Clash
-https://cdn.jsdelivr.net/gh/<用户名>/shadowcat-sub@main/sub/<密钥>.json    sing-box
+https://<用户名>.github.io/<仓库名>/shadowcat.txt     通用订阅 base64
+https://<用户名>.github.io/<仓库名>/shadowcat.yaml    Clash
+https://<用户名>.github.io/<仓库名>/shadowcat.json    sing-box
 ```
 
-jsDelivr 是 CDN，国内比 `raw.githubusercontent.com` 稳。想换 raw 就把
-`cdn.jsdelivr.net/gh` 替换成 `raw.githubusercontent.com`。
+国内 github.io 偶尔抽风，备用走 jsDelivr CDN：
 
-> **隐私提醒**：这种方式靠**随机文件名**保密。仓库若公开，知道文件名的人就能拉到节点
-> （GitHub 上有爬虫专门扫这类订阅文件）。不在意就够用，在意就用下面的 B。
+```
+https://cdn.jsdelivr.net/gh/<用户名>/<仓库名>@main/shadowcat.txt
+https://cdn.jsdelivr.net/gh/<用户名>/<仓库名>@main/shadowcat.yaml
+https://cdn.jsdelivr.net/gh/<用户名>/<仓库名>@main/shadowcat.json
+```
+
+想换 raw 就把 `cdn.jsdelivr.net/gh` 替换成 `raw.githubusercontent.com`
+（去掉 `@main`，换成分支路径）。
+
+想改文件名，设环境变量 `SC_SUB_NAME=别的名字` 再跑 `build.py`。
+
+> **隐私提醒**：文件名是固定的 `shadowcat.txt`，**等于公开**。仓库公开的情况下
+> 任何人（包括 GitHub 上的爬虫）都能拉到你的节点。不在意就够用，在意就用下面的 B。
 
 ### B. Cloudflare Worker（带密钥校验，隐私更好）
 

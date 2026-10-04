@@ -29,7 +29,11 @@ import shadowcat_nodes as sc  # noqa: E402
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(ROOT, "dist")
-SUB = os.path.join(ROOT, "sub")            # GitHub 静态订阅（jsDelivr / raw 直接访问）
+# GitHub 静态订阅：放仓库根目录，Pages / jsDelivr 直接访问，
+# 地址形如 https://<user>.github.io/<repo>/shadowcat.txt
+SUB = ROOT
+SUB_NAME = os.environ.get("SC_SUB_NAME", "shadowcat").strip() or "shadowcat"
+SUB_FILES = ("txt", "yaml", "json")
 WORKER = os.path.join(ROOT, "worker")
 WRANGLER = os.path.join(WORKER, "wrangler.toml")
 DATA_JS = os.path.join(WORKER, "src", "data.js")
@@ -260,22 +264,29 @@ def main():
     with open(os.path.join(DIST, "meta.json"), "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
 
-    # GitHub 静态订阅：文件名本身就是密钥，可直接被 jsDelivr / raw 访问。
-    # 密钥复用（不重新生成），所以文件名固定 -> 订阅地址固定。
+    # GitHub 静态订阅：文件名固定为 shadowcat.{txt,yaml,json}，放在仓库根目录，
+    # 这样 Pages / jsDelivr 的地址最短最好记：
+    #   https://<user>.github.io/<repo>/shadowcat.txt
     os.makedirs(SUB, exist_ok=True)
+    keep = {f"{SUB_NAME}.{s}" for s in SUB_FILES}
     for suffix, content in [("txt", sub_b64), ("yaml", clash), ("json", singbox)]:
-        with open(os.path.join(SUB, f"{secret}.{suffix}"), "w", encoding="utf-8") as f:
+        with open(os.path.join(SUB, f"{SUB_NAME}.{suffix}"), "w", encoding="utf-8") as f:
             f.write(content)
-    # 清掉旧密钥留下的文件，避免仓库里堆积历史订阅
+    # 清掉根目录里历史遗留的订阅文件（旧随机密钥名等），避免仓库堆积。
+    # 只动 .txt/.yaml/.json，且跳过 dist/ 之类的子目录，源码文件不受影响。
     for name in os.listdir(SUB):
-        if not name.startswith(secret + "."):
+        p = os.path.join(SUB, name)
+        if os.path.isdir(p):
+            continue
+        if name.endswith(SUB_FILES) and name not in keep:
             try:
-                os.remove(os.path.join(SUB, name))
+                os.remove(p)
             except OSError:
                 pass
 
-    print(f"      节点 {len(proxies)} 个  SNI={real_sni}  密钥={secret}")
+    print(f"      节点 {len(proxies)} 个  SNI={real_sni}  订阅名={SUB_NAME}")
     print(f"      产物: {DIST}")
+    print(f"      静态订阅: {os.path.join(SUB, SUB_NAME)}.{{{','.join(SUB_FILES)}}}")
     print(f"      Worker 数据: {DATA_JS}")
 
 

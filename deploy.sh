@@ -124,15 +124,23 @@ fi
 
 echo "==> [4/4] 输出订阅地址"
 BRANCH=$(git branch --show-current)
-BASE="https://cdn.jsdelivr.net/gh/$ME/$REPO_NAME@$BRANCH/sub/$SECRET"
+SUB_NAME="${SC_SUB_NAME:-shadowcat}"
+JS="https://cdn.jsdelivr.net/gh/$ME/$REPO_NAME@$BRANCH/$SUB_NAME"
+IO="https://$(echo "$ME" | tr '[:upper:]' '[:lower:]').github.io/$REPO_NAME/$SUB_NAME"
 echo
-echo "──────── 固定订阅地址（GitHub + jsDelivr） ────────"
-echo "  通用订阅  $BASE.txt"
-echo "  Clash     $BASE.yaml"
-echo "  sing-box  $BASE.json"
-echo "──────────────────────────────────────────────────"
+echo "──────── 固定订阅地址 ────────"
+echo "  [GitHub Pages，最短]"
+echo "  通用订阅  $IO.txt"
+echo "  Clash     $IO.yaml"
+echo "  sing-box  $IO.json"
 echo
-echo "  jsDelivr 首次缓存需 1-3 分钟；之后每次 Actions 刷新会自动生效。"
+echo "  [jsDelivr 备用，国内更稳]"
+echo "  通用订阅  $JS.txt"
+echo "  Clash     $JS.yaml"
+echo "  sing-box  $JS.json"
+echo "──────────────────────────────"
+echo
+echo "  jsDelivr / Pages 首次生效需 1-3 分钟；之后每次 Actions 刷新自动更新。"
 
 if [[ $PRIVATE -eq 1 ]]; then
   echo
