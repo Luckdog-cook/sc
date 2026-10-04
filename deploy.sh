@@ -1,62 +1,79 @@
 #!/usr/bin/env bash
-# 一键推送到 GitHub（私有仓库）并部署到 Cloudflare Worker
+# 推送到 GitHub（私有仓库）并部署到 Cloudflare Worker
 #
-# 用法：
-#   export GH_TOKEN=ghp_xxxxxxxxxxxx          # GitHub PAT，需要 repo 权限
-#   export CLOUDFLARE_API_TOKEN=xxxx          # CF API Token（Edit Cloudflare Workers）
-#   export CLOUDFLARE_ACCOUNT_ID=xxxx         # CF Account ID
-#   export SC_ACCOUNT=你的账号                 # 只写进 GitHub Secrets，不落盘到代码
-#   export SC_PASSWORD=你的密码
-#   ./deploy.sh
+# GitHub 凭据二选一：
+#   1) 在 CodeBuddy 设置页「连接器」授权 GitHub，脚本自动用内置 GITHUB_TOKEN
+#   2) export GH_TOKEN=ghp_xxxx   手动给 PAT（需要 repo 权限）
 #
-# 可选：REPO_NAME=xxx 改仓库名（默认 shadowcat-sub）
+# Cloudflare（可选，给了才会部署）：
+#   export CLOUDFLARE_API_TOKEN=xxxx
+#   export CLOUDFLARE_ACCOUNT_ID=xxxx
+#
+# 节点账号（只写进 GitHub Secrets，不进代码）：
+#   export SC_ACCOUNT=... SC_PASSWORD=...
+#
+# 只推 GitHub 不部署 CF：直接跑 ./deploy.sh 即可（会跳过部署步骤）
 
 set -euo pipefail
 cd "$(dirname "$0")"
 
 REPO_NAME="${REPO_NAME:-shadowcat-sub}"
+GH_TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
 
-need() { [[ -n "${!1:-}" ]] || { echo "缺少环境变量 $1"; exit 1; }; }
-need GH_TOKEN
-need CLOUDFLARE_API_TOKEN
-need CLOUDFLARE_ACCOUNT_ID
-need SC_ACCOUNT
-need SC_PASSWORD
+[[ -n "$GH_TOKEN" ]] || { echo "缺少 GitHub 凭据：请在 CodeBuddy 设置页授权 GitHub，或 export GH_TOKEN=ghp_xxx"; exit 1; }
 
-echo "==> [1/5] 登录 GitHub"
-echo "$GH_TOKEN" | gh auth login --with-token
-gh auth status
+json() { python3.11 -c "import sys,json;d=json.load(sys.stdin);print($1)" 2>/dev/null || echo ""; }
 
-echo "==> [2/5] 创建私有仓库并推送"
-if gh repo view "$REPO_NAME" >/dev/null 2>&1; then
+echo "==> [1/4] 登录 GitHub"
+echo "$GH_TOKEN" | gh auth login --with-token >/dev/null 2>&1
+ME=$(curl -s -m 20 -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user | json "d.get('login','')")
+[[ -n "$ME" ]] || { echo "登录失败，token 无效或已过期"; exit 1; }
+echo "    已登录为 $ME"
+
+echo "==> [2/4] 创建私有仓库 $REPO_NAME 并推送"
+if curl -s -m 20 -o /dev/null -w '%{http_code}' \
+     -H "Authorization: Bearer $GH_TOKEN" \
+     "https://api.github.com/repos/$ME/$REPO_NAME" | grep -q 200; then
   echo "    仓库已存在，复用"
-  git remote remove origin 2>/dev/null || true
-  gh repo set-default "$REPO_NAME" 2>/dev/null || true
-  git remote add origin "https://github.com/$(gh api user --jq .login)/$REPO_NAME.git"
 else
-  gh repo create "$REPO_NAME" --private --source=. --push
+  curl -s -m 30 -X POST -H "Authorization: Bearer $GH_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"name\":\"$REPO_NAME\",\"private\":true,\"auto_init\":false}" \
+    https://api.github.com/user/repos >/dev/null
+  echo "    已创建私有仓库"
 fi
-git push -u origin "$(git branch --show-current)" --force-with-lease
+git remote remove origin 2>/dev/null || true
+git remote add origin "https://oauth2:${GH_TOKEN}@github.com/$ME/$REPO_NAME.git"
+git push -u origin "$(git branch --show-current)" --force-with-lease >/dev/null 2>&1
+echo "    已推送 -> https://github.com/$ME/$REPO_NAME"
 
-echo "==> [3/5] 写入 GitHub Secrets"
-gh secret set SC_ACCOUNT          --body "$SC_ACCOUNT"
-gh secret set SC_PASSWORD         --body "$SC_PASSWORD"
-gh secret set CLOUDFLARE_API_TOKEN  --body "$CLOUDFLARE_API_TOKEN"
-gh secret set CLOUDFLARE_ACCOUNT_ID --body "$CLOUDFLARE_ACCOUNT_ID"
-echo "    已写入 4 个 Secret（账号密码不会出现在代码里）"
+echo "==> [3/4] 写入 GitHub Secrets"
+if [[ -n "${SC_ACCOUNT:-}" && -n "${SC_PASSWORD:-}" ]]; then
+  gh secret set SC_ACCOUNT  --body "$SC_ACCOUNT"   >/dev/null
+  gh secret set SC_PASSWORD --body "$SC_PASSWORD"  >/dev/null
+  echo "    SC_ACCOUNT / SC_PASSWORD 已写入（不进代码）"
+else
+  echo "    跳过：未设置 SC_ACCOUNT / SC_PASSWORD"
+fi
+if [[ -n "${CLOUDFLARE_API_TOKEN:-}" && -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+  gh secret set CLOUDFLARE_API_TOKEN   --body "$CLOUDFLARE_API_TOKEN"   >/dev/null
+  gh secret set CLOUDFLARE_ACCOUNT_ID  --body "$CLOUDFLARE_ACCOUNT_ID"  >/dev/null
+  echo "    CLOUDFLARE_API_TOKEN / ACCOUNT_ID 已写入"
+else
+  echo "    跳过：未设置 Cloudflare 凭据，Actions 定时刷新会失败"
+fi
 
-echo "==> [4/5] 部署 Worker 到 Cloudflare"
-cd worker
-CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
-CLOUDFLARE_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID" \
-  npx wrangler deploy
-cd - >/dev/null
+echo "==> [4/4] 部署 Worker"
+if [[ -n "${CLOUDFLARE_API_TOKEN:-}" && -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+  (cd worker && CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN" \
+                CLOUDFLARE_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID" \
+                npx wrangler deploy)
+else
+  echo "    跳过：没有 Cloudflare API Token"
+  echo "    拿到后单独跑： cd worker && CLOUDFLARE_API_TOKEN=xxx CLOUDFLARE_ACCOUNT_ID=xxx npx wrangler deploy"
+fi
 
-echo "==> [5/5] 触发一次 Actions 刷新"
-gh workflow run refresh.yml 2>/dev/null || echo "    （可稍后在 Actions 页面手动 Run workflow）"
-
+SECRET=$(grep -oP '(?<=SUB_SECRET = ")[^"]+' worker/wrangler.toml)
 echo
-echo "完成。订阅首页地址形如："
-echo "  https://shadowcat-sub.<你的子域>.workers.dev/$(grep -oP '(?<=SUB_SECRET = ")[^"]+' worker/wrangler.toml)"
-echo
-echo "提醒：客户端要开「跳过证书验证」，NekoBox 把 URL 测试改成 http://cp.cloudflare.com/generate_204"
+echo "订阅首页: https://shadowcat-sub.<你的子域>.workers.dev/$SECRET"
+echo "GitHub:   https://github.com/$ME/$REPO_NAME"
