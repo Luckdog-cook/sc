@@ -42,73 +42,50 @@ SC_ACCOUNT=你的账号 SC_PASSWORD=你的密码 python3 build.py
 
 ## 部署
 
-### 1. GitHub（私有仓库）
+### 最简：一条命令出订阅地址
+
+不需要域名、不需要 GitHub，只要一个 Cloudflare API Token。
 
 ```bash
-git init && git add -A && git commit -m "init"
-gh repo create shadowcat-sub --private --source=. --push
+export CLOUDFLARE_API_TOKEN=xxxx     # CF → My Profile → API Tokens → Edit Cloudflare Workers 模板
+export CLOUDFLARE_ACCOUNT_ID=xxxx    # CF 控制台右侧栏
+./deploy.sh --cf-only
 ```
 
-然后在仓库 **Settings → Secrets and variables → Actions** 添加：
+跑完自动打印订阅地址。这是**静态快照**，节点有变动时重跑一次即可。
 
-| Secret | 说明 |
-|---|---|
-| `SC_ACCOUNT` | ShadowCat 账号 |
-| `SC_PASSWORD` | ShadowCat 密码 |
-| `CLOUDFLARE_API_TOKEN` | CF API Token（Workers 编辑权限） |
-| `CLOUDFLARE_ACCOUNT_ID` | CF Account ID |
-| `SUB_SECRET` | 可选。固定订阅密钥；不设就用 `wrangler.toml` 里已生成的值 |
+### 可选：每 6 小时自动刷新节点
 
+多一步 GitHub 私有仓库，Actions 定时重跑脚本拉最新节点。
+
+```bash
+export GH_TOKEN=ghp_xxxx             # repo 权限；或在 CodeBuddy 设置页授权 GitHub
+export SC_ACCOUNT=你的账号 SC_PASSWORD=你的密码
+./deploy.sh
+```
+
+脚本会建私有仓库、推送、把 Secret 写进 Actions，然后部署。
 `SC_ACCOUNT` / `SC_PASSWORD` **只存在 Secrets 里，不会写进任何文件**。
 
-### 2. Cloudflare Worker
+### 可选：换成自己的域名
 
-API Token 在 CF Dashboard → My Profile → API Tokens 创建，
-用 **Edit Cloudflare Workers** 模板即可。Account ID 在右侧栏。
+`workers.dev` 能用，想换才看这节。
 
-配好 Secrets 后，手动跑一次 Actions（`Run workflow`）就会生成 + 部署，
-之后每 6 小时自动刷新。
+**不是所有免费域名都能接 CF** —— 后缀必须在公共后缀列表(PSL)上。
+DNSHE 的 `.de5.net` / `.us.ci` / `.cc.cd` 可以，`.ddns.ge` 不行（CF 不收）。
 
-也可以本地部署：
-
-```bash
-cd worker && npx wrangler deploy
-```
-
-### 3. 绑定自己的域名（可选，推荐）
-
-`workers.dev` 能用但不好看，绑个自己的域名更干净。
-
-**A. DNSHE 免费域名接入 Cloudflare**
-
-DNSHE 免费域名后缀里，**只有 `.de5.net` / `.us.ci` / `.cc.cd` 能接入 CF**，
-`ddns.ge` 不在公共后缀列表(PSL)上，CF 不收。注册时选 `.de5.net`。
-
-1. Cloudflare → 加入域 → 输入你的域名（如 `luckdog.de5.net`）→ 选 Free 套餐
-2. 复制 CF 分配的两个 NS 地址（形如 `conrad.ns.cloudflare.com` / `danica.ns.cloudflare.com`）
-3. DNSHE → 域名 → **DNS服务器** → 粘贴这两个地址（每行一个）→ 一键替换
-4. 回 CF 点「我已更新名称服务器」，等状态变 **活动**（通常几分钟到几小时）
-
-> 注意：改的是 **Nameservers**，不是 A 记录。Worker 没有固定 IPv4，
-> 填任何 IP 都错。
-
-**B. Worker 绑定域名**
-
-域名状态变「活动」后，在 `worker/wrangler.toml` 里取消注释并改成你的域名：
+1. CF → 加入域 → 填域名 → 选 Free 套餐 → 复制 CF 给的两个 NS
+2. 域名服务商 → 改 **Nameservers**（不是 A 记录，Worker 没有固定 IP）→ 粘贴 CF 的 NS
+3. 回 CF 点「我已更新名称服务器」，等状态变 **活动**
+4. `worker/wrangler.toml` 里取消注释，改成你的域名：
 
 ```toml
 routes = [
-  { pattern = "luckdog.de5.net", custom_domain = true }
+  { pattern = "你的域名.com", custom_domain = true }
 ]
 ```
 
-或 CF 控制台：Workers → shadowcat-sub → 设置 → 域名和路由 → 添加自定义域名。
-CF 会自动签发证书并加好 CNAME。
-
-之后订阅地址就是：
-```
-https://luckdog.de5.net/shadowcat.txt?token=<密钥>
-```
+5. 重新 `./deploy.sh --cf-only`
 
 ## 目录结构
 
