@@ -1,12 +1,16 @@
 /**
  * ShadowCat 订阅分发 Worker
  *
- * 路由（密钥 = wrangler.toml 里的 SUB_SECRET）：
- *   /<密钥>            订阅首页，列出所有订阅链接，方便复制
- *   /sub/<密钥>        base64 通用订阅（trojan 链接）
- *   /clash/<密钥>      Clash / Clash Meta 配置
- *   /singbox/<密钥>    sing-box 配置
- *   /trojan/<密钥>     明文 trojan 链接
+ * 支持两种密钥传法，任选其一（推荐查询参数，格式更干净）：
+ *   A. 查询参数：/shadowcat.txt?token=<密钥>
+ *   B. 路径    ：/sub/<密钥>
+ *
+ * 内容类型：
+ *   /shadowcat.txt   /sub        通用订阅（base64，trojan 链接）
+ *   /clash.yaml      /clash      Clash / Clash Meta 配置
+ *   /singbox.json    /singbox    sing-box 配置
+ *   /trojan.txt      /trojan     明文 trojan 链接
+ *   /                /<密钥>     订阅首页，列出所有链接方便复制
  *
  * 密钥不对一律 404（不返回 403，避免暴露「这个路径存在」）。
  */
@@ -14,6 +18,34 @@
 import { SUB_B64, CLASH_YAML, SINGBOX_JSON, TROJAN_TEXT, META } from './data.js';
 
 const PLAIN = 'text/plain; charset=utf-8';
+
+// 文件名 -> 内容类型。路径和查询参数两种模式共用
+const FILES = {
+  home: '',
+  sub: 'shadowcat.txt',
+  clash: 'clash.yaml',
+  singbox: 'singbox.json',
+  trojan: 'trojan.txt',
+};
+
+// 路径别名 -> 内容类型（去掉扩展名后的主干）
+const ALIAS = {
+  '': 'home',
+  home: 'home',
+  index: 'home',
+  sub: 'sub',
+  shadowcat: 'sub',
+  subscribe: 'sub',
+  b64: 'sub',
+  clash: 'clash',
+  'clash-meta': 'clash',
+  singbox: 'singbox',
+  'sing-box': 'singbox',
+  sb: 'singbox',
+  trojan: 'trojan',
+  link: 'trojan',
+  links: 'trojan',
+};
 
 function subHeaders(extra = {}) {
   return {
@@ -33,8 +65,7 @@ function ok(body, type = PLAIN) {
 // 每次都要新建 —— Response 的 body 只能读一次，共享实例会导致第二次请求抛错
 const miss = () => new Response('Not found\n', { status: 404, headers: { 'Content-Type': PLAIN } });
 
-function homepage(secret) {
-  const base = (u) => `${u}/${secret}`;
+function homepage(secret, useQuery) {
   const list = [
     ['通用订阅 (base64)', 'sub', 'v2rayN / NekoBox / Shadowrocket 等大多数客户端'],
     ['Clash 配置', 'clash', 'Clash / Clash Meta，含分流规则'],
@@ -51,6 +82,10 @@ function homepage(secret) {
       </tr>`
     )
     .join('');
+
+  const sample = useQuery
+    ? `${FILES.sub}?token=${secret}`
+    : `sub/${secret}`;
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -78,8 +113,12 @@ function homepage(secret) {
   button.done { background:#1f6feb; }
   .tip { margin-top:22px; padding:14px 16px; background:#161b22; border:1px solid #30363d;
          border-radius:8px; color:#8b949e; font-size:13px; }
-  .tip code { background:#0e1116; padding:2px 6px; border-radius:4px; color:#e6edf3; }
+  .tip code { background:#0e1116; padding:2px 6px; border-radius:4px; color:#e6edf3;
+              word-break:break-all; }
   .warn { border-color:#9e6a03; color:#d9a441; }
+  input { width:100%; box-sizing:border-box; margin-top:8px; background:#0e1116; color:#e6edf3;
+          border:1px solid #30363d; border-radius:6px; padding:8px 10px; font-size:12px;
+          font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 </style>
 </head>
 <body>
@@ -91,26 +130,36 @@ function homepage(secret) {
   </div>
   <table>${rows}</table>
   <div class="tip">
+    订阅地址示例：<code>${sample}</code>
+    <input readonly value="${sample}" onclick="this.select()">
+  </div>
+  <div class="tip">
     客户端里必须开启「跳过证书验证 / allowInsecure」，服务端是自签证书。
     SNI 已经自动修正为 <code>${META.sni}</code>，
     不要改回 <code>pss.bdstatic.com</code>，否则会报 x509 主机名不匹配。
   </div>
   <div class="tip warn">
-    这个页面的地址就是密钥，别到处发。泄露后重新部署换一个新密钥即可。
+    地址里的 token 就是密钥，别到处发。泄露后重新部署换一个新密钥即可。
   </div>
 </div>
 <script>
-  const S = location.pathname.replace(/\\/+$/, '').split('/').pop();
+  var Q = new URLSearchParams(location.search);
+  var USEQ = Q.has('token');
+  var S = Q.get('token') || location.pathname.replace(/\\/+$/, '').split('/').pop();
+  var F = ${JSON.stringify(FILES)};
   document.querySelectorAll('.cp').forEach(b => {
     b.onclick = async () => {
-      const u = location.origin + '/' + b.dataset.kind + '/' + S;
+      var k = b.dataset.kind;
+      var u = USEQ
+        ? location.origin + '/' + F[k] + '?token=' + encodeURIComponent(S)
+        : location.origin + '/' + k + '/' + S;
       try { await navigator.clipboard.writeText(u); }
       catch (e) {
-        const t = document.createElement('textarea');
+        var t = document.createElement('textarea');
         t.value = u; document.body.appendChild(t); t.select();
         document.execCommand('copy'); t.remove();
       }
-      const old = b.textContent;
+      var old = b.textContent;
       b.textContent = '已复制'; b.classList.add('done');
       setTimeout(() => { b.textContent = old; b.classList.remove('done'); }, 1600);
     };
@@ -120,6 +169,28 @@ function homepage(secret) {
 </html>`;
 }
 
+function resolve(url) {
+  /** 解析出 { kind, key }。密钥优先取 ?token=，其次取路径最后一段。 */
+  const q = url.searchParams;
+  const token = q.get('token') || q.get('key') || '';
+  const parts = url.pathname.split('/').filter(Boolean);
+
+  // 查询参数模式：/shadowcat.txt?token=xxx
+  if (token) {
+    const tail = parts.length ? parts[parts.length - 1] : '';
+    const stem = tail.replace(/\.(txt|yaml|yml|json|conf)$/i, '').toLowerCase();
+    return { kind: ALIAS[stem] ?? null, key: token };
+  }
+
+  // 路径模式：/sub/<密钥> 或 /<密钥>
+  if (parts.length === 1) return { kind: 'home', key: parts[0] };
+  if (parts.length === 2) {
+    const stem = parts[0].replace(/\.(txt|yaml|yml|json|conf)$/i, '').toLowerCase();
+    return { kind: ALIAS[stem] ?? null, key: parts[1] };
+  }
+  return { kind: null, key: '' };
+}
+
 export default {
   async fetch(request, env) {
     const secret = env.SUB_SECRET;
@@ -127,25 +198,14 @@ export default {
       return new Response('Worker 未配置 SUB_SECRET\n', { status: 500, headers: { 'Content-Type': PLAIN } });
     }
 
-    const { pathname } = new URL(request.url);
-    const parts = pathname.split('/').filter(Boolean);
+    const url = new URL(request.url);
+    const { kind, key } = resolve(url);
 
-    let kind, key;
-    if (parts.length === 1) {
-      kind = 'home';
-      key = parts[0];
-    } else if (parts.length === 2) {
-      kind = parts[0];
-      key = parts[1];
-    } else {
-      return miss();
-    }
-
-    if (key !== secret) return miss();
+    if (!kind || key !== secret) return miss();
 
     switch (kind) {
       case 'home':
-        return new Response(homepage(secret), {
+        return new Response(homepage(secret, url.searchParams.has('token')), {
           status: 200,
           headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
         });

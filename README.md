@@ -5,13 +5,18 @@ GitHub Actions 每 6 小时自动刷新节点。
 
 ## 订阅地址
 
+推荐用查询参数形式（`?token=`），格式最干净：
+
 ```
-https://<你的worker域名>/<密钥>              订阅首页（列出所有链接，可一键复制）
-https://<你的worker域名>/sub/<密钥>          通用订阅 base64，v2rayN / NekoBox / Shadowrocket
-https://<你的worker域名>/clash/<密钥>        Clash / Clash Meta（含分流规则）
-https://<你的worker域名>/singbox/<密钥>      sing-box（含 urltest 自动选点）
-https://<你的worker域名>/trojan/<密钥>       明文 trojan:// 链接
+https://<域名>/shadowcat.txt?token=<密钥>    通用订阅 base64，v2rayN / NekoBox / Shadowrocket
+https://<域名>/clash.yaml?token=<密钥>        Clash / Clash Meta（含分流规则）
+https://<域名>/singbox.json?token=<密钥>      sing-box（含 urltest 自动选点）
+https://<域名>/trojan.txt?token=<密钥>        明文 trojan:// 链接
+https://<域名>/?token=<密钥>                  订阅首页（列出所有链接，可一键复制）
 ```
+
+路径形式同样支持，两种任选：
+`/sub/<密钥>`、`/clash/<密钥>`、`/singbox/<密钥>`、`/trojan/<密钥>`、`/<密钥>`
 
 密钥在 `worker/wrangler.toml` 的 `SUB_SECRET` 里。**改了它，之前发出去的链接全部失效。**
 
@@ -68,6 +73,41 @@ API Token 在 CF Dashboard → My Profile → API Tokens 创建，
 
 ```bash
 cd worker && npx wrangler deploy
+```
+
+### 3. 绑定自己的域名（可选，推荐）
+
+`workers.dev` 能用但不好看，绑个自己的域名更干净。
+
+**A. DNSHE 免费域名接入 Cloudflare**
+
+DNSHE 免费域名后缀里，**只有 `.de5.net` / `.us.ci` / `.cc.cd` 能接入 CF**，
+`ddns.ge` 不在公共后缀列表(PSL)上，CF 不收。注册时选 `.de5.net`。
+
+1. Cloudflare → 加入域 → 输入你的域名（如 `luckdog.de5.net`）→ 选 Free 套餐
+2. 复制 CF 分配的两个 NS 地址（形如 `conrad.ns.cloudflare.com` / `danica.ns.cloudflare.com`）
+3. DNSHE → 域名 → **DNS服务器** → 粘贴这两个地址（每行一个）→ 一键替换
+4. 回 CF 点「我已更新名称服务器」，等状态变 **活动**（通常几分钟到几小时）
+
+> 注意：改的是 **Nameservers**，不是 A 记录。Worker 没有固定 IPv4，
+> 填任何 IP 都错。
+
+**B. Worker 绑定域名**
+
+域名状态变「活动」后，在 `worker/wrangler.toml` 里取消注释并改成你的域名：
+
+```toml
+routes = [
+  { pattern = "luckdog.de5.net", custom_domain = true }
+]
+```
+
+或 CF 控制台：Workers → shadowcat-sub → 设置 → 域名和路由 → 添加自定义域名。
+CF 会自动签发证书并加好 CNAME。
+
+之后订阅地址就是：
+```
+https://luckdog.de5.net/shadowcat.txt?token=<密钥>
 ```
 
 ## 目录结构
