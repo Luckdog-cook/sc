@@ -33,7 +33,7 @@ for a in "$@"; do
   esac
 done
 
-REPO_NAME="${REPO_NAME:-shadowcat-sub}"
+REPO_NAME="${REPO_NAME:-sc}"
 GH_TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
 SECRET=$(grep -oP '(?<=SUB_SECRET = ")[^"]+' worker/wrangler.toml)
 
@@ -82,7 +82,10 @@ fi
 [[ -n "$GH_TOKEN" ]] || { echo "缺少 GitHub 凭据：请在 CodeBuddy 设置页授权 GitHub，或 export GH_TOKEN=ghp_xxx"; exit 1; }
 
 echo "==> [1/4] 登录 GitHub"
-echo "$GH_TOKEN" | gh auth login --with-token >/dev/null 2>&1
+# GH_TOKEN 已在环境变量里时，gh 会拒绝 --with-token（退出码 1），但认证本来就生效了
+if ! gh auth status >/dev/null 2>&1; then
+  echo "$GH_TOKEN" | gh auth login --with-token >/dev/null 2>&1 || true
+fi
 ME=$(curl -s -m 20 -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user | json "d.get('login','')")
 [[ -n "$ME" ]] || { echo "登录失败，token 无效或已过期"; exit 1; }
 echo "    已登录为 $ME"

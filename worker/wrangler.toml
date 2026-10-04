@@ -10,7 +10,7 @@ compatibility_date = "2024-11-01"
 # ]
 
 [vars]
-SUB_SECRET = "3975617212df1ee29dc437d72fa08a5a"
+SUB_SECRET = "rvx9dup71q"
 
 [observability]
 enabled = true
