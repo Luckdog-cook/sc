@@ -1,0 +1,11 @@
+# Cloudflare Worker 配置
+# SUB_SECRET 是订阅路径密钥，改了它所有已发出的订阅链接都会失效。
+name = "shadowcat-sub"
+main = "src/worker.js"
+compatibility_date = "2024-11-01"
+
+[vars]
+SUB_SECRET = "3975617212df1ee29dc437d72fa08a5a"
+
+[observability]
+enabled = true

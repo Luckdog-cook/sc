@@ -1,0 +1,155 @@
+# ShadowCat 订阅 - 由 build.py 自动生成
+# SNI 已按服务端真实证书自动修正，请勿手改成 pss.bdstatic.com
+
+proxies:
+  - name: "日本-01"
+    type: trojan
+    server: 14.18.234.79
+    port: 58969
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "韩国-02"
+    type: trojan
+    server: 27.102.139.29
+    port: 46137
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-03"
+    type: trojan
+    server: 14.18.234.79
+    port: 16483
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-04"
+    type: trojan
+    server: 183.240.41.144
+    port: 17652
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-05"
+    type: trojan
+    server: 206.119.185.125
+    port: 46312
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "日本-06"
+    type: trojan
+    server: 14.18.234.79
+    port: 41362
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "日本-07"
+    type: trojan
+    server: 206.119.185.125
+    port: 26495
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "韩国-08"
+    type: trojan
+    server: 27.102.137.177
+    port: 21777
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "韩国-09"
+    type: trojan
+    server: 27.102.138.75
+    port: 9687
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "中国香港-10"
+    type: trojan
+    server: 122.13.138.26
+    port: 62881
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "中国香港-11"
+    type: trojan
+    server: 14.18.234.79
+    port: 9164
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "中国香港-12"
+    type: trojan
+    server: 206.119.185.125
+    port: 11589
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+
+proxy-groups:
+  - name: "PROXY"
+    type: select
+    proxies:
+      - "♻️ 自动选择"
+      - DIRECT
+      - "日本-01"
+      - "韩国-02"
+      - "新加坡-03"
+      - "新加坡-04"
+      - "新加坡-05"
+      - "日本-06"
+      - "日本-07"
+      - "韩国-08"
+      - "韩国-09"
+      - "中国香港-10"
+      - "中国香港-11"
+      - "中国香港-12"
+
+  - name: "♻️ 自动选择"
+    type: url-test
+    url: http://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - "日本-01"
+      - "韩国-02"
+      - "新加坡-03"
+      - "新加坡-04"
+      - "新加坡-05"
+      - "日本-06"
+      - "日本-07"
+      - "韩国-08"
+      - "韩国-09"
+      - "中国香港-10"
+      - "中国香港-11"
+      - "中国香港-12"
+
+rules:
+  - GEOSITE,cn,DIRECT
+  - GEOIP,CN,DIRECT
+  - MATCH,PROXY
