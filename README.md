@@ -5,20 +5,36 @@ GitHub Actions 每 6 小时自动刷新节点。
 
 ## 订阅地址
 
-推荐用查询参数形式（`?token=`），格式最干净：
+两种方式，按你配了什么选。
+
+### A. GitHub 静态订阅（推上去就有，不需要 Cloudflare）
 
 ```
-https://<域名>/shadowcat.txt?token=<密钥>    通用订阅 base64，v2rayN / NekoBox / Shadowrocket
-https://<域名>/clash.yaml?token=<密钥>        Clash / Clash Meta（含分流规则）
-https://<域名>/singbox.json?token=<密钥>      sing-box（含 urltest 自动选点）
-https://<域名>/trojan.txt?token=<密钥>        明文 trojan:// 链接
-https://<域名>/?token=<密钥>                  订阅首页（列出所有链接，可一键复制）
+https://cdn.jsdelivr.net/gh/<用户名>/shadowcat-sub@main/sub/<密钥>.txt     通用订阅 base64
+https://cdn.jsdelivr.net/gh/<用户名>/shadowcat-sub@main/sub/<密钥>.yaml    Clash
+https://cdn.jsdelivr.net/gh/<用户名>/shadowcat-sub@main/sub/<密钥>.json    sing-box
 ```
 
-路径形式同样支持，两种任选：
-`/sub/<密钥>`、`/clash/<密钥>`、`/singbox/<密钥>`、`/trojan/<密钥>`、`/<密钥>`
+jsDelivr 是 CDN，国内比 `raw.githubusercontent.com` 稳。想换 raw 就把
+`cdn.jsdelivr.net/gh` 替换成 `raw.githubusercontent.com`。
 
-密钥在 `worker/wrangler.toml` 的 `SUB_SECRET` 里。**改了它，之前发出去的链接全部失效。**
+> **隐私提醒**：这种方式靠**随机文件名**保密。仓库若公开，知道文件名的人就能拉到节点
+> （GitHub 上有爬虫专门扫这类订阅文件）。不在意就够用，在意就用下面的 B。
+
+### B. Cloudflare Worker（带密钥校验，隐私更好）
+
+```
+https://<worker域名>/shadowcat.txt?token=<密钥>    通用订阅 base64
+https://<worker域名>/clash.yaml?token=<密钥>        Clash / Clash Meta
+https://<worker域名>/singbox.json?token=<密钥>      sing-box
+https://<worker域名>/trojan.txt?token=<密钥>        明文 trojan:// 链接
+https://<worker域名>/?token=<密钥>                  订阅首页（可一键复制）
+```
+
+路径形式同样支持：`/sub/<密钥>`、`/clash/<密钥>`、`/singbox/<密钥>`、`/<密钥>`。
+
+密钥在 `worker/wrangler.toml` 的 `SUB_SECRET` 里，**只生成一次并复用** ——
+改了它之前发出去的链接全部失效，所以定时刷新不会重新生成。
 
 ## 客户端必做两件事
 
@@ -42,30 +58,43 @@ SC_ACCOUNT=你的账号 SC_PASSWORD=你的密码 python3 build.py
 
 ## 部署
 
-### 最简：一条命令出订阅地址
+### 推荐：推到 GitHub，之后全自动
 
-不需要域名、不需要 GitHub，只要一个 Cloudflare API Token。
+只要 GitHub。推上去后 Actions 自己跑：拉节点 → 生成订阅 → 提交 → 出地址，
+之后每 6 小时自动刷新一次。
+
+1. 建仓库，把代码推上去
+2. Settings → Secrets and variables → Actions 添加：
+
+   | Secret | 说明 |
+   |---|---|
+   | `SC_ACCOUNT` | ShadowCat 账号 |
+   | `SC_PASSWORD` | ShadowCat 密码 |
+   | `CLOUDFLARE_API_TOKEN` | 可选。给了就自动部署 Worker |
+   | `CLOUDFLARE_ACCOUNT_ID` | 可选。同上 |
+
+3. Actions → **刷新订阅并部署** → Run workflow
+4. 跑完点进这次运行，页面下方 **Summary** 里直接列出订阅地址
+
+账号密码只存在 Secrets 里，不会写进任何文件、不会出现在日志里。
+
+> **公开还是私有？** 这个得二选一：
+> - **jsDelivr/raw 静态订阅** → 仓库必须**公开**（私有仓库 CDN 读不到文件），
+>   节点靠随机文件名保密，有被爬虫扫到的风险。
+> - **Worker 订阅** → 仓库可以**私有**，数据在 Worker 里、靠密钥校验，
+>   别人拿到地址没有密钥也是 404。隐私更好，但要 CF 凭据。
+>
+> 两个都有就两个都能用，地址不冲突。
+
+### 本地跑一次（不想用 GitHub）
 
 ```bash
-export CLOUDFLARE_API_TOKEN=xxxx     # CF → My Profile → API Tokens → Edit Cloudflare Workers 模板
-export CLOUDFLARE_ACCOUNT_ID=xxxx    # CF 控制台右侧栏
+export CLOUDFLARE_API_TOKEN=xxxx
+export CLOUDFLARE_ACCOUNT_ID=xxxx
 ./deploy.sh --cf-only
 ```
 
-跑完自动打印订阅地址。这是**静态快照**，节点有变动时重跑一次即可。
-
-### 可选：每 6 小时自动刷新节点
-
-多一步 GitHub 私有仓库，Actions 定时重跑脚本拉最新节点。
-
-```bash
-export GH_TOKEN=ghp_xxxx             # repo 权限；或在 CodeBuddy 设置页授权 GitHub
-export SC_ACCOUNT=你的账号 SC_PASSWORD=你的密码
-./deploy.sh
-```
-
-脚本会建私有仓库、推送、把 Secret 写进 Actions，然后部署。
-`SC_ACCOUNT` / `SC_PASSWORD` **只存在 Secrets 里，不会写进任何文件**。
+静态快照，节点变了重跑。
 
 ### 可选：换成自己的域名
 

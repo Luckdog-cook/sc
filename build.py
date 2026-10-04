@@ -29,6 +29,7 @@ import shadowcat_nodes as sc  # noqa: E402
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(ROOT, "dist")
+SUB = os.path.join(ROOT, "sub")            # GitHub 静态订阅（jsDelivr / raw 直接访问）
 WORKER = os.path.join(ROOT, "worker")
 WRANGLER = os.path.join(WORKER, "wrangler.toml")
 DATA_JS = os.path.join(WORKER, "src", "data.js")
@@ -54,11 +55,32 @@ def load_or_create_secret() -> str:
 
 
 def write_wrangler(secret: str):
+    """重写 wrangler.toml。
+
+    注意：订阅密钥固定不变，所以这里可以安全重写；但用户可能手动启用了
+    自定义域名(routes)，重写时必须把它原样保留，否则每次刷新都会冲掉。
+    """
+    routes_block = ""
+    if os.path.exists(WRANGLER):
+        cur = open(WRANGLER, encoding="utf-8").read()
+        m = re.search(r"^\s*routes\s*=\s*\[.*?\]", cur, re.M | re.S)
+        if m:
+            routes_block = m.group(0)
+    if not routes_block:
+        routes_block = (
+            "# 自定义域名（可选）：先把域名托管到 Cloudflare，再取消注释\n"
+            "# routes = [\n"
+            '#   { pattern = "你的域名.com", custom_domain = true }\n'
+            "# ]"
+        )
+
     content = f"""# Cloudflare Worker 配置
-# SUB_SECRET 是订阅路径密钥，改了它所有已发出的订阅链接都会失效。
+# SUB_SECRET 是订阅密钥，改了它所有已发出的订阅链接都会失效。
 name = "shadowcat-sub"
 main = "src/worker.js"
 compatibility_date = "2024-11-01"
+
+{routes_block}
 
 [vars]
 SUB_SECRET = "{secret}"
@@ -237,6 +259,20 @@ def main():
 
     with open(os.path.join(DIST, "meta.json"), "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    # GitHub 静态订阅：文件名本身就是密钥，可直接被 jsDelivr / raw 访问。
+    # 密钥复用（不重新生成），所以文件名固定 -> 订阅地址固定。
+    os.makedirs(SUB, exist_ok=True)
+    for suffix, content in [("txt", sub_b64), ("yaml", clash), ("json", singbox)]:
+        with open(os.path.join(SUB, f"{secret}.{suffix}"), "w", encoding="utf-8") as f:
+            f.write(content)
+    # 清掉旧密钥留下的文件，避免仓库里堆积历史订阅
+    for name in os.listdir(SUB):
+        if not name.startswith(secret + "."):
+            try:
+                os.remove(os.path.join(SUB, name))
+            except OSError:
+                pass
 
     print(f"      节点 {len(proxies)} 个  SNI={real_sni}  密钥={secret}")
     print(f"      产物: {DIST}")

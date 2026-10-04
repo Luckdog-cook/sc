@@ -1,14 +1,12 @@
 # Cloudflare Worker 配置
-# SUB_SECRET 是订阅路径密钥，改了它所有已发出的订阅链接都会失效。
+# SUB_SECRET 是订阅密钥，改了它所有已发出的订阅链接都会失效。
 name = "shadowcat-sub"
 main = "src/worker.js"
 compatibility_date = "2024-11-01"
 
-# 自定义域名：先把域名托管到 Cloudflare（状态为「活动」），
-# 再取消下面注释并改成你的域名，然后 npx wrangler deploy。
-# 注意是 custom_domain，不是改 DNS 的 A 记录 —— Worker 没有固定 IP。
+# 自定义域名（可选）：先把域名托管到 Cloudflare，再取消注释
 # routes = [
-#   { pattern = "luckdog.de5.net", custom_domain = true }
+#   { pattern = "你的域名.com", custom_domain = true }
 # ]
 
 [vars]

@@ -1,6 +1,12 @@
 name: 刷新订阅并部署
 
 on:
+  # 推代码就跑一次（改 dist/ sub/ 不算，那是本工作流自己提交的，避免套娃）
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - 'dist/**'
+      - 'sub/**'
   schedule:
     # 每 6 小时刷新一次（分钟错开整点，避开 GitHub 排队高峰）
     - cron: '23 */6 * * *'
@@ -12,6 +18,9 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    env:
+      # 有 CF 凭据就顺带部署 Worker；没有也照样产出 GitHub 静态订阅
+      HAS_CF: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,18 +39,88 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist worker/src/data.js worker/wrangler.toml
+          git add dist sub worker/src/data.js worker/wrangler.toml
           if git diff --staged --quiet; then
             echo "订阅内容没有变化，跳过提交"
           else
-            git commit -m "chore: 刷新订阅 $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git commit -m "chore: 刷新订阅 $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
             git push
           fi
 
       - name: 部署到 Cloudflare Worker
+        if: env.HAS_CF == 'true'
+        id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
           command: deploy
+
+      - name: 刷新 jsDelivr 缓存
+        continue-on-error: true
+        env:
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          SECRET=$(grep -oP '(?<=SUB_SECRET = ")[^"]+' worker/wrangler.toml)
+          for f in txt yaml json; do
+            curl -s -X POST "https://purge.jsdelivr.net/gh/$REPO@$BRANCH/sub/$SECRET.$f" \
+              -H "User-Agent: shadowcat-sub" -o /dev/null || true
+          done
+          echo "已请求刷新 CDN 缓存"
+
+      - name: 输出订阅地址
+        env:
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          SECRET=$(grep -oP '(?<=SUB_SECRET = ")[^"]+' worker/wrangler.toml)
+          BASE="https://cdn.jsdelivr.net/gh/$REPO@$BRANCH/sub/$SECRET"
+          {
+            echo "## ShadowCat 订阅地址"
+            echo ""
+            echo "**密钥** \`$SECRET\`"
+            echo ""
+            echo "### GitHub 静态订阅（jsDelivr CDN）"
+            echo ""
+            echo "| 类型 | 地址 |"
+            echo "|---|---|"
+            echo "| 通用订阅 base64 | \`$BASE.txt\` |"
+            echo "| Clash | \`$BASE.yaml\` |"
+            echo "| sing-box | \`$BASE.json\` |"
+            echo ""
+            echo "备选：把 \`cdn.jsdelivr.net/gh\` 换成 \`raw.githubusercontent.com\`"
+            echo "（jsDelivr 国内更快，raw 国内访问不稳）。"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$HAS_CF" = "true" ]; then
+            {
+              echo ""
+              echo "### Cloudflare Worker（已部署，带密钥校验）"
+              echo ""
+              echo "地址见上一步 deploy 日志里 wrangler 输出的 URL，拼上："
+              echo ""
+              echo '```'
+              echo "/shadowcat.txt?token=$SECRET"
+              echo "/clash.yaml?token=$SECRET"
+              echo "/?token=$SECRET"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo ""
+              echo "---"
+              echo ""
+              echo "未配置 Cloudflare 凭据，只用 GitHub 静态订阅。"
+              echo "想要**带密钥校验**的订阅（隐私更好），去仓库"
+              echo "Settings → Secrets 添加 \`CLOUDFLARE_API_TOKEN\` 和 \`CLOUDFLARE_ACCOUNT_ID\`，"
+              echo "下次运行会自动部署 Worker。"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "----- 订阅地址 -----"
+          echo "通用订阅: $BASE.txt"
+          echo "Clash   : $BASE.yaml"
+          echo "sing-box: $BASE.json"
+          echo "--------------------"
