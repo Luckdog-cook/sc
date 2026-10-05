@@ -2,34 +2,7 @@
 # SNI 已按服务端真实证书自动修正，请勿手改成 pss.bdstatic.com
 
 proxies:
-  - name: "新加坡-01"
-    type: trojan
-    server: 14.18.234.79
-    port: 16483
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "日本-02"
-    type: trojan
-    server: 14.18.234.79
-    port: 41362
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "日本-03"
-    type: trojan
-    server: 14.18.234.79
-    port: 58969
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "韩国-04"
+  - name: "韩国-01"
     type: trojan
     server: 27.102.139.29
     port: 46137
@@ -38,7 +11,25 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "新加坡-05"
+  - name: "新加坡-02"
+    type: trojan
+    server: 14.18.234.79
+    port: 16483
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-03"
+    type: trojan
+    server: 206.119.185.125
+    port: 46312
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-04"
     type: trojan
     server: 122.13.138.26
     port: 64823
@@ -47,34 +38,34 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "新加坡-06"
+  - name: "日本-05"
     type: trojan
-    server: 183.240.41.144
-    port: 17652
+    server: 206.119.185.125
+    port: 34339
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "韩国-07"
+  - name: "韩国-06"
     type: trojan
-    server: 27.102.137.177
-    port: 21777
+    server: 27.102.138.244
+    port: 55912
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "韩国-08"
+  - name: "日本-07"
     type: trojan
-    server: 27.102.138.75
-    port: 9687
+    server: 14.18.234.79
+    port: 58969
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "日本-09"
+  - name: "日本-08"
     type: trojan
     server: 206.119.185.125
     port: 26495
@@ -83,7 +74,25 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
+  - name: "韩国-09"
+    type: trojan
+    server: 27.102.138.75
+    port: 9687
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
   - name: "中国香港-10"
+    type: trojan
+    server: 122.13.138.26
+    port: 62881
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "中国香港-11"
     type: trojan
     server: 206.119.185.125
     port: 11589
@@ -92,19 +101,10 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "中国香港-11"
+  - name: "中国香港-12"
     type: trojan
     server: 14.18.234.79
     port: 9164
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "中国香港-12"
-    type: trojan
-    server: 122.13.138.26
-    port: 62881
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
@@ -117,15 +117,15 @@ proxy-groups:
     proxies:
       - "♻️ 自动选择"
       - DIRECT
-      - "新加坡-01"
-      - "日本-02"
-      - "日本-03"
-      - "韩国-04"
-      - "新加坡-05"
-      - "新加坡-06"
-      - "韩国-07"
-      - "韩国-08"
-      - "日本-09"
+      - "韩国-01"
+      - "新加坡-02"
+      - "新加坡-03"
+      - "新加坡-04"
+      - "日本-05"
+      - "韩国-06"
+      - "日本-07"
+      - "日本-08"
+      - "韩国-09"
       - "中国香港-10"
       - "中国香港-11"
       - "中国香港-12"
@@ -136,15 +136,15 @@ proxy-groups:
     interval: 300
     tolerance: 50
     proxies:
-      - "新加坡-01"
-      - "日本-02"
-      - "日本-03"
-      - "韩国-04"
-      - "新加坡-05"
-      - "新加坡-06"
-      - "韩国-07"
-      - "韩国-08"
-      - "日本-09"
+      - "韩国-01"
+      - "新加坡-02"
+      - "新加坡-03"
+      - "新加坡-04"
+      - "日本-05"
+      - "韩国-06"
+      - "日本-07"
+      - "日本-08"
+      - "韩国-09"
       - "中国香港-10"
       - "中国香港-11"
       - "中国香港-12"
