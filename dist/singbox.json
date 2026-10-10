@@ -5,39 +5,7 @@
   "outbounds": [
     {
       "type": "trojan",
-      "tag": "新加坡-01",
-      "server": "14.18.234.79",
-      "server_port": 16483,
-      "password": "410f567c8cdc340b30f13a30003af611",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.baidu.com",
-        "insecure": true,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        }
-      }
-    },
-    {
-      "type": "trojan",
-      "tag": "新加坡-02",
-      "server": "183.240.41.144",
-      "server_port": 17652,
-      "password": "410f567c8cdc340b30f13a30003af611",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.baidu.com",
-        "insecure": true,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        }
-      }
-    },
-    {
-      "type": "trojan",
-      "tag": "韩国-03",
+      "tag": "韩国-01",
       "server": "27.102.139.29",
       "server_port": 46137,
       "password": "410f567c8cdc340b30f13a30003af611",
@@ -53,9 +21,9 @@
     },
     {
       "type": "trojan",
-      "tag": "日本-04",
+      "tag": "新加坡-02",
       "server": "14.18.234.79",
-      "server_port": 41362,
+      "server_port": 16483,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -69,7 +37,7 @@
     },
     {
       "type": "trojan",
-      "tag": "日本-05",
+      "tag": "日本-03",
       "server": "14.18.234.79",
       "server_port": 58969,
       "password": "410f567c8cdc340b30f13a30003af611",
@@ -85,7 +53,23 @@
     },
     {
       "type": "trojan",
-      "tag": "新加坡-06",
+      "tag": "韩国-04",
+      "server": "27.102.137.177",
+      "server_port": 21777,
+      "password": "410f567c8cdc340b30f13a30003af611",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.baidu.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "type": "trojan",
+      "tag": "新加坡-05",
       "server": "122.13.138.26",
       "server_port": 64823,
       "password": "410f567c8cdc340b30f13a30003af611",
@@ -101,9 +85,9 @@
     },
     {
       "type": "trojan",
-      "tag": "韩国-07",
-      "server": "27.102.138.244",
-      "server_port": 55912,
+      "tag": "韩国-06",
+      "server": "27.102.138.75",
+      "server_port": 9687,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -117,9 +101,25 @@
     },
     {
       "type": "trojan",
-      "tag": "韩国-08",
-      "server": "27.102.138.75",
-      "server_port": 9687,
+      "tag": "新加坡-07",
+      "server": "206.119.185.125",
+      "server_port": 46312,
+      "password": "410f567c8cdc340b30f13a30003af611",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.baidu.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "type": "trojan",
+      "tag": "日本-08",
+      "server": "14.18.234.79",
+      "server_port": 41362,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -182,8 +182,8 @@
     {
       "type": "trojan",
       "tag": "中国香港-12",
-      "server": "183.240.41.144",
-      "server_port": 19361,
+      "server": "206.119.185.125",
+      "server_port": 11589,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -199,14 +199,14 @@
       "type": "selector",
       "tag": "select",
       "outbounds": [
-        "新加坡-01",
+        "韩国-01",
         "新加坡-02",
-        "韩国-03",
-        "日本-04",
-        "日本-05",
-        "新加坡-06",
-        "韩国-07",
-        "韩国-08",
+        "日本-03",
+        "韩国-04",
+        "新加坡-05",
+        "韩国-06",
+        "新加坡-07",
+        "日本-08",
         "日本-09",
         "中国香港-10",
         "中国香港-11",
@@ -217,14 +217,14 @@
       "type": "urltest",
       "tag": "auto",
       "outbounds": [
-        "新加坡-01",
+        "韩国-01",
         "新加坡-02",
-        "韩国-03",
-        "日本-04",
-        "日本-05",
-        "新加坡-06",
-        "韩国-07",
-        "韩国-08",
+        "日本-03",
+        "韩国-04",
+        "新加坡-05",
+        "韩国-06",
+        "新加坡-07",
+        "日本-08",
         "日本-09",
         "中国香港-10",
         "中国香港-11",
