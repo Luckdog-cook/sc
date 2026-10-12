@@ -53,39 +53,7 @@
     },
     {
       "type": "trojan",
-      "tag": "日本-04",
-      "server": "14.18.234.79",
-      "server_port": 41362,
-      "password": "410f567c8cdc340b30f13a30003af611",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.baidu.com",
-        "insecure": true,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        }
-      }
-    },
-    {
-      "type": "trojan",
-      "tag": "日本-05",
-      "server": "14.18.234.79",
-      "server_port": 58969,
-      "password": "410f567c8cdc340b30f13a30003af611",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.baidu.com",
-        "insecure": true,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        }
-      }
-    },
-    {
-      "type": "trojan",
-      "tag": "新加坡-06",
+      "tag": "新加坡-04",
       "server": "183.240.41.144",
       "server_port": 17652,
       "password": "410f567c8cdc340b30f13a30003af611",
@@ -101,41 +69,73 @@
     },
     {
       "type": "trojan",
+      "tag": "日本-05",
+      "server": "14.18.234.79",
+      "server_port": 41362,
+      "password": "410f567c8cdc340b30f13a30003af611",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.baidu.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "type": "trojan",
+      "tag": "日本-06",
+      "server": "14.18.234.79",
+      "server_port": 58969,
+      "password": "410f567c8cdc340b30f13a30003af611",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.baidu.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "type": "trojan",
       "tag": "韩国-07",
+      "server": "27.102.138.244",
+      "server_port": 55912,
+      "password": "410f567c8cdc340b30f13a30003af611",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.baidu.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "type": "trojan",
+      "tag": "日本-08",
+      "server": "206.119.185.125",
+      "server_port": 34339,
+      "password": "410f567c8cdc340b30f13a30003af611",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.baidu.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "type": "trojan",
+      "tag": "韩国-09",
       "server": "27.102.138.75",
       "server_port": 9687,
-      "password": "410f567c8cdc340b30f13a30003af611",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.baidu.com",
-        "insecure": true,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        }
-      }
-    },
-    {
-      "type": "trojan",
-      "tag": "韩国-08",
-      "server": "27.102.137.177",
-      "server_port": 21777,
-      "password": "410f567c8cdc340b30f13a30003af611",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.baidu.com",
-        "insecure": true,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        }
-      }
-    },
-    {
-      "type": "trojan",
-      "tag": "日本-09",
-      "server": "206.119.185.125",
-      "server_port": 26495,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -166,8 +166,8 @@
     {
       "type": "trojan",
       "tag": "中国香港-11",
-      "server": "14.18.234.79",
-      "server_port": 9164,
+      "server": "183.240.41.144",
+      "server_port": 19361,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -182,8 +182,8 @@
     {
       "type": "trojan",
       "tag": "中国香港-12",
-      "server": "183.240.41.144",
-      "server_port": 19361,
+      "server": "14.18.234.79",
+      "server_port": 9164,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -202,12 +202,12 @@
         "韩国-01",
         "新加坡-02",
         "新加坡-03",
-        "日本-04",
+        "新加坡-04",
         "日本-05",
-        "新加坡-06",
+        "日本-06",
         "韩国-07",
-        "韩国-08",
-        "日本-09",
+        "日本-08",
+        "韩国-09",
         "中国香港-10",
         "中国香港-11",
         "中国香港-12"
@@ -220,12 +220,12 @@
         "韩国-01",
         "新加坡-02",
         "新加坡-03",
-        "日本-04",
+        "新加坡-04",
         "日本-05",
-        "新加坡-06",
+        "日本-06",
         "韩国-07",
-        "韩国-08",
-        "日本-09",
+        "日本-08",
+        "韩国-09",
         "中国香港-10",
         "中国香港-11",
         "中国香港-12"
