@@ -13,8 +13,8 @@ proxies:
     client-fingerprint: chrome
   - name: "韩国-02"
     type: trojan
-    server: 27.102.138.244
-    port: 55912
+    server: 27.102.137.177
+    port: 21777
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
@@ -22,59 +22,23 @@ proxies:
     client-fingerprint: chrome
   - name: "韩国-03"
     type: trojan
-    server: 27.102.138.75
-    port: 9687
+    server: 27.102.138.244
+    port: 55912
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "新加坡-04"
-    type: trojan
-    server: 122.13.138.26
-    port: 64823
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "新加坡-05"
+  - name: "日本-04"
     type: trojan
     server: 14.18.234.79
-    port: 16483
+    port: 41362
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "新加坡-06"
-    type: trojan
-    server: 183.240.41.144
-    port: 17652
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "日本-07"
-    type: trojan
-    server: 14.18.234.79
-    port: 58969
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "日本-08"
-    type: trojan
-    server: 206.119.185.125
-    port: 34339
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "日本-09"
+  - name: "日本-05"
     type: trojan
     server: 206.119.185.125
     port: 26495
@@ -83,7 +47,52 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
+  - name: "日本-06"
+    type: trojan
+    server: 45.119.98.99
+    port: 34339
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-07"
+    type: trojan
+    server: 183.240.41.144
+    port: 17652
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-08"
+    type: trojan
+    server: 122.13.138.26
+    port: 64823
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-09"
+    type: trojan
+    server: 14.18.234.79
+    port: 16483
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
   - name: "中国香港-10"
+    type: trojan
+    server: 45.119.98.99
+    port: 62881
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "中国香港-11"
     type: trojan
     server: 14.18.234.79
     port: 9164
@@ -92,19 +101,10 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "中国香港-11"
+  - name: "中国香港-12"
     type: trojan
     server: 206.119.185.125
     port: 11589
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "中国香港-12"
-    type: trojan
-    server: 122.13.138.26
-    port: 62881
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
@@ -120,12 +120,12 @@ proxy-groups:
       - "韩国-01"
       - "韩国-02"
       - "韩国-03"
-      - "新加坡-04"
-      - "新加坡-05"
-      - "新加坡-06"
-      - "日本-07"
-      - "日本-08"
-      - "日本-09"
+      - "日本-04"
+      - "日本-05"
+      - "日本-06"
+      - "新加坡-07"
+      - "新加坡-08"
+      - "新加坡-09"
       - "中国香港-10"
       - "中国香港-11"
       - "中国香港-12"
@@ -139,12 +139,12 @@ proxy-groups:
       - "韩国-01"
       - "韩国-02"
       - "韩国-03"
-      - "新加坡-04"
-      - "新加坡-05"
-      - "新加坡-06"
-      - "日本-07"
-      - "日本-08"
-      - "日本-09"
+      - "日本-04"
+      - "日本-05"
+      - "日本-06"
+      - "新加坡-07"
+      - "新加坡-08"
+      - "新加坡-09"
       - "中国香港-10"
       - "中国香港-11"
       - "中国香港-12"
