@@ -40,23 +40,14 @@ proxies:
     client-fingerprint: chrome
   - name: "韩国-05"
     type: trojan
-    server: 27.102.138.244
-    port: 55912
+    server: 27.102.138.75
+    port: 9687
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
   - name: "日本-06"
-    type: trojan
-    server: 45.119.98.99
-    port: 34339
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "日本-07"
     type: trojan
     server: 14.18.234.79
     port: 58969
@@ -65,19 +56,28 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "日本-08"
+  - name: "中国香港-07"
     type: trojan
     server: 14.18.234.79
-    port: 41362
+    port: 9164
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "中国香港-09"
+  - name: "日本-08"
     type: trojan
-    server: 45.119.98.99
-    port: 62881
+    server: 183.240.41.144
+    port: 34339
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "日本-09"
+    type: trojan
+    server: 206.119.185.125
+    port: 26495
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
@@ -85,8 +85,8 @@ proxies:
     client-fingerprint: chrome
   - name: "新加坡-10"
     type: trojan
-    server: 122.13.138.26
-    port: 64823
+    server: 45.119.98.99
+    port: 17652
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
@@ -103,8 +103,8 @@ proxies:
     client-fingerprint: chrome
   - name: "新加坡-12"
     type: trojan
-    server: 183.240.41.144
-    port: 17652
+    server: 122.13.138.26
+    port: 64823
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
@@ -123,9 +123,9 @@ proxy-groups:
       - "韩国-04"
       - "韩国-05"
       - "日本-06"
-      - "日本-07"
+      - "中国香港-07"
       - "日本-08"
-      - "中国香港-09"
+      - "日本-09"
       - "新加坡-10"
       - "新加坡-11"
       - "新加坡-12"
@@ -142,9 +142,9 @@ proxy-groups:
       - "韩国-04"
       - "韩国-05"
       - "日本-06"
-      - "日本-07"
+      - "中国香港-07"
       - "日本-08"
-      - "中国香港-09"
+      - "日本-09"
       - "新加坡-10"
       - "新加坡-11"
       - "新加坡-12"
