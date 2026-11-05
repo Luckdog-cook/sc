@@ -22,8 +22,8 @@
     {
       "type": "trojan",
       "tag": "韩国-02",
-      "server": "27.102.137.177",
-      "server_port": 21777,
+      "server": "27.102.138.244",
+      "server_port": 55912,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -38,8 +38,8 @@
     {
       "type": "trojan",
       "tag": "韩国-03",
-      "server": "27.102.137.19",
-      "server_port": 10745,
+      "server": "27.102.137.177",
+      "server_port": 21777,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -70,24 +70,8 @@
     {
       "type": "trojan",
       "tag": "日本-05",
-      "server": "45.119.98.99",
-      "server_port": 53921,
-      "password": "410f567c8cdc340b30f13a30003af611",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.baidu.com",
-        "insecure": true,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        }
-      }
-    },
-    {
-      "type": "trojan",
-      "tag": "日本-06",
       "server": "45.250.184.195",
-      "server_port": 58969,
+      "server_port": 34339,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -101,9 +85,25 @@
     },
     {
       "type": "trojan",
-      "tag": "新加坡-07",
+      "tag": "新加坡-06",
       "server": "14.18.234.79",
       "server_port": 16483,
+      "password": "410f567c8cdc340b30f13a30003af611",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.baidu.com",
+        "insecure": true,
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      }
+    },
+    {
+      "type": "trojan",
+      "tag": "日本-07",
+      "server": "45.250.184.195",
+      "server_port": 58969,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -150,8 +150,8 @@
     {
       "type": "trojan",
       "tag": "中国香港-10",
-      "server": "14.18.234.79",
-      "server_port": 48321,
+      "server": "45.250.184.195",
+      "server_port": 63261,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -166,8 +166,8 @@
     {
       "type": "trojan",
       "tag": "中国香港-11",
-      "server": "45.250.184.195",
-      "server_port": 12820,
+      "server": "14.18.234.79",
+      "server_port": 48321,
       "password": "410f567c8cdc340b30f13a30003af611",
       "tls": {
         "enabled": true,
@@ -204,8 +204,8 @@
         "韩国-03",
         "日本-04",
         "日本-05",
-        "日本-06",
-        "新加坡-07",
+        "新加坡-06",
+        "日本-07",
         "新加坡-08",
         "新加坡-09",
         "中国香港-10",
@@ -222,8 +222,8 @@
         "韩国-03",
         "日本-04",
         "日本-05",
-        "日本-06",
-        "新加坡-07",
+        "新加坡-06",
+        "日本-07",
         "新加坡-08",
         "新加坡-09",
         "中国香港-10",
