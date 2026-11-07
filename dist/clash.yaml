@@ -4,6 +4,15 @@
 proxies:
   - name: "韩国-01"
     type: trojan
+    server: 27.102.137.19
+    port: 10745
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "韩国-02"
+    type: trojan
     server: 27.102.138.75
     port: 9687
     password: "410f567c8cdc340b30f13a30003af611"
@@ -11,7 +20,7 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "韩国-02"
+  - name: "韩国-03"
     type: trojan
     server: 27.102.137.177
     port: 21777
@@ -20,25 +29,7 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
-  - name: "韩国-03"
-    type: trojan
-    server: 27.102.137.19
-    port: 10745
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
   - name: "日本-04"
-    type: trojan
-    server: 120.86.123.169
-    port: 58969
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "日本-05"
     type: trojan
     server: 111.45.23.204
     port: 34891
@@ -47,34 +38,25 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
+  - name: "日本-05"
+    type: trojan
+    server: 120.86.123.169
+    port: 34339
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
   - name: "日本-06"
     type: trojan
-    server: 14.18.234.79
-    port: 41362
+    server: 120.86.123.169
+    port: 58969
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
   - name: "新加坡-07"
-    type: trojan
-    server: 111.45.23.204
-    port: 46312
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "新加坡-08"
-    type: trojan
-    server: 14.18.234.79
-    port: 11053
-    password: "410f567c8cdc340b30f13a30003af611"
-    sni: www.baidu.com
-    skip-cert-verify: true
-    udp: true
-    client-fingerprint: chrome
-  - name: "新加坡-09"
     type: trojan
     server: 45.250.184.195
     port: 16483
@@ -83,10 +65,28 @@ proxies:
     skip-cert-verify: true
     udp: true
     client-fingerprint: chrome
+  - name: "新加坡-08"
+    type: trojan
+    server: 120.86.123.169
+    port: 64823
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
+  - name: "新加坡-09"
+    type: trojan
+    server: 45.119.98.99
+    port: 17652
+    password: "410f567c8cdc340b30f13a30003af611"
+    sni: www.baidu.com
+    skip-cert-verify: true
+    udp: true
+    client-fingerprint: chrome
   - name: "中国香港-10"
     type: trojan
-    server: 45.250.184.195
-    port: 34423
+    server: 120.86.123.169
+    port: 62881
     password: "410f567c8cdc340b30f13a30003af611"
     sni: www.baidu.com
     skip-cert-verify: true
